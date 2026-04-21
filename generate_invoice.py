@@ -52,7 +52,8 @@ def generate_from_excel(file_path):
 
     for i in tqdm(df.invoice_no.unique(), total = df.invoice_no.nunique()):
         data = df[df['invoice_no'] == i].fillna('').to_dict(orient = 'records')
-        f = open('Finance Invoice template.docx', 'rb')
+        template_path = os.path.join(os.path.dirname(__file__), 'Finance Invoice template.docx')
+        f = open(template_path, 'rb')
         
         
                         
