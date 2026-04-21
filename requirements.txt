@@ -1,0 +1,6 @@
+pandas
+numpy
+python-docx
+xlrd
+openpyxl
+tqdm
