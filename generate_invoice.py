@@ -103,7 +103,7 @@ def generate_from_excel(file_path):
         set_cell_text(doc.tables[0].cell(29, 3), "Total",    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
         
         for i, item in enumerate(data):
-            set_cell_text(doc.tables[0].cell(22 + i, 0), item.get('description'))
+            set_cell_text(doc.tables[0].cell(22 + i, 0), item.get('description'), align=WD_ALIGN_PARAGRAPH.LEFT)
             set_cell_text(doc.tables[0].cell(22 + i, 2), f"{item.get('price_qty', ''):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
             set_cell_text(doc.tables[0].cell(22 + i, 3), str(item.get('qty', '')).replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
             set_cell_text(doc.tables[0].cell(22 + i, 4), f"{float(item.get('amount', '')):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
