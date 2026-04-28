@@ -62,12 +62,10 @@ def generate_from_excel(file_path):
             # Dynamic rows — line items
             subtotal = sum([x.get('amount', 0) for x in data])
             vat_ori = sum([x.get('vat', 0) for x in data])
-            print(vat_ori)
             total = f"Rp. {(round(subtotal + vat_ori)):,}".replace('.0', '')
             
             subtotal = f"Rp. {round(subtotal):,}".replace('.0', '')
             vat =f"Rp. {round(vat_ori):,}".replace('.0', '')
-            print(vat)
                 
             inv_no = data[0].get('invoice_no')
             # Static fields
@@ -108,9 +106,7 @@ def generate_from_excel(file_path):
                 set_cell_text(doc.tables[0].cell(row, col), value)
             
             # Bold cells — subtotal, vat, 
-            print(i, ' ==> ',vat_ori)
             if vat_ori == 0:
-                print("No VAT, skipping VAT row")
                 set_cell_text(doc.tables[0].cell(27, 4), str(total).replace('.0', ''),    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
                 set_cell_text(doc.tables[0].cell(27, 3), "Total",    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
             else:
