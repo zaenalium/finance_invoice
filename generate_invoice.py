@@ -59,8 +59,8 @@ def generate_from_excel(file_path):
             doc = Document(f)
             
             # Dynamic rows — line items
-            subtotal = sum([int(x.get('amount', 0)) for x in data])
-            vat_ori = sum([int(x.get('vat', 0)) for x in data])
+            subtotal = round(sum([int(x.get('amount', 0)) for x in data]))   
+            vat_ori = round(sum([int(x.get('vat', 0)) for x in data]))
             total = f"Rp. {(round(subtotal + vat_ori)):,}".replace('.0', '')
             
             subtotal = f"Rp. {round(subtotal):,}".replace('.0', '')
@@ -104,7 +104,7 @@ def generate_from_excel(file_path):
             for row, col, value in static_cells:
                 set_cell_text(doc.tables[0].cell(row, col), value)
             
-            # Bold cells — subtotal, vat, 
+            # Bold cells — subtotal, vat, total
             if vat_ori == 0:
                 set_cell_text(doc.tables[0].cell(27, 4), str(total).replace('.0', ''),    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
                 set_cell_text(doc.tables[0].cell(27, 3), "Total",    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
@@ -117,11 +117,11 @@ def generate_from_excel(file_path):
                 set_cell_text(doc.tables[0].cell(28, 3), "VAT Total",      bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
                 set_cell_text(doc.tables[0].cell(29, 3), "Total",    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
                 
-            for i, item in enumerate(data):
-                set_cell_text(doc.tables[0].cell(22 + i, 0), item.get('description'), align=WD_ALIGN_PARAGRAPH.LEFT)
-                set_cell_text(doc.tables[0].cell(22 + i, 2), f"{item.get('price_qty', ''):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
-                set_cell_text(doc.tables[0].cell(22 + i, 3), str(item.get('qty', '')).replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
-                set_cell_text(doc.tables[0].cell(22 + i, 4), f"{float(item.get('amount', '')):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
+            for j, item in enumerate(data):
+                set_cell_text(doc.tables[0].cell(22 + j, 0), item.get('description'), align=WD_ALIGN_PARAGRAPH.LEFT)
+                set_cell_text(doc.tables[0].cell(22 + j, 2), f"{item.get('price_qty', ''):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
+                set_cell_text(doc.tables[0].cell(22 + j, 3), str(item.get('qty', '')).replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
+                set_cell_text(doc.tables[0].cell(22 + j, 4), f"{float(item.get('amount', '')):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
             
             
             if not os.path.exists(f'output'):
