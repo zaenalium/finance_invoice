@@ -45,23 +45,22 @@ def set_cell_text(cell, text, font_size=9, font_name='Arial', font_color=None, b
 
 def generate_from_excel(file_path):
     df = pd.read_excel(file_path)
-    df['price_qty'] = df['price_qty'].round(0)
-    df['vat']= df['vat'].round(0)
-    df['amount']= df['amount'].round(0)
-    df['invoice_date'] = pd.to_datetime(df['invoice_date']).dt.strftime('%d/%m/%Y')
 
-    log = []
-    try:
-        for i in tqdm(df.invoice_no.unique(), total = df.invoice_no.nunique()):
-            data = df[df['invoice_no'] == i].fillna('').to_dict(orient = 'records')
+    log_success = []
+    for inv in tqdm(df.invoice_no.unique(), total = df.invoice_no.nunique()):
+        try:
+            data = df[df['invoice_no'] == inv].fillna('').to_dict(orient = 'records')
+            
+            dt_inv = pd.to_datetime(data[0]['invoice_date']).strftime('%d/%m/%Y')
+
             template_path = os.path.join(os.path.dirname(__file__), 'Finance Invoice template.docx')
             f = open(template_path, 'rb')
             
             doc = Document(f)
             
             # Dynamic rows — line items
-            subtotal = sum([x.get('amount', 0) for x in data])
-            vat_ori = sum([x.get('vat', 0) for x in data])
+            subtotal = sum([int(x.get('amount', 0)) for x in data])
+            vat_ori = sum([int(x.get('vat', 0)) for x in data])
             total = f"Rp. {(round(subtotal + vat_ori)):,}".replace('.0', '')
             
             subtotal = f"Rp. {round(subtotal):,}".replace('.0', '')
@@ -88,7 +87,7 @@ def generate_from_excel(file_path):
                     (19, 0, data[0].get('address_4'))]
 
             static_cells = [
-                (1, 4, data[0].get('invoice_date')),
+                (1, 4, dt_inv),
                 (2, 4, inv_no),
                 (3, 4, data[0].get('po')),
                 # (27, 4, str(subtotal).replace('.0', '')),
@@ -138,8 +137,8 @@ def generate_from_excel(file_path):
                             )
                 
             os.remove(tmp_name)
-        log.append({'invoice_no': i, 'status': 'Success'})
-    except Exception as e:
-        log.append({'invoice_no': i, 'status': 'Failed', 'error': str(e)}.replace('\n', '  '))
-    df_log = pd.DataFrame(log)
+            log_success.append({'invoice_no': inv, 'status': 'Success'})
+        except Exception as e:
+            log_success.append({'invoice_no': inv, 'status': 'Failed', 'error': str(e).replace('\n', '  ')})
+    df_log = pd.DataFrame(log_success)
     df_log.to_excel('output/log.xlsx', index=False)
