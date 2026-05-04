@@ -98,7 +98,7 @@ def generate_from_excel(file_path):
                 (32, 0, data[0].get('payment_notes')),
                 (36, 0, 'Account Name           : ' + str(data[0].get('bank_account_name', '')).replace('.0', '')),
                 (37, 0, 'Bank                          : ' + str(data[0].get('bank', ''))),
-                (38, 0, 'Account Number        : ' + str(data[0].get('bank_account_number', ''))),
+                (38, 0, 'Account Number        : ' + str(data[0].get('bank_account_number', '')).replace('.0', '')),
                 (39, 0, 'Branch                       : ' + str(data[0].get('bank_branch', ''))),
                 (40, 0, 'Swift Code                 : ' + str(data[0].get('swift_code', ''))),  # fixed: was overwriting row 39
             ] + addess_company
