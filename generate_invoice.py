@@ -44,6 +44,8 @@ def set_cell_text(cell, text, font_size=9, font_name='Arial', font_color=None, b
 
 
 def generate_from_excel(file_path):
+    if not os.path.exists(f'output'):
+        os.makedirs(f'output')
     df = pd.read_excel(file_path)
 
     log_success = []
@@ -124,8 +126,6 @@ def generate_from_excel(file_path):
                 set_cell_text(doc.tables[0].cell(22 + j, 4), f"{round(float(item.get('amount', ''))):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
             
             
-            if not os.path.exists(f'output'):
-                os.makedirs(f'output')
             
             tmp_name = f'output/Invoice_{inv_no}.docx'
             doc.save(tmp_name)
