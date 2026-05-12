@@ -160,6 +160,9 @@ def generate_from_excel(file_path):
                     (17, 0, data[0].get('address_2')),
                     (18, 0, data[0].get('address_3')),
                     (19, 0, data[0].get('address_4'))]
+            
+            for row, col, value in addess_company:
+                set_cell_text(doc.tables[0].cell(row, col), value)
 
             current_row = 22
 
@@ -205,25 +208,6 @@ def generate_from_excel(file_path):
             payment_notes_row = 32 + extra_rows
             payment_notes_row2 = 33 + extra_rows
 
-            static_cells = [
-                (1, 4, dt_inv),
-                (2, 4, inv_no),
-                (3, 4, data[0].get('po')),
-                (title_note, 0, 'Payment notes:'),
-                (payment_notes_row, 0, data[0].get('payment_notes')),
-                (payment_notes_row2, 0, '2. Please make your payment into our account bank:'),
-            ] + [
-                (bank_rows[0], 0, 'Account Name           : ' + str(data[0].get('bank_account_name', '')).replace('.0', '')),
-                (bank_rows[1], 0, 'Bank                          : ' + str(data[0].get('bank', ''))),
-                (bank_rows[2], 0, 'Account Number        : ' + str(data[0].get('bank_account_number', '')).replace('.0', '')),
-                (bank_rows[3], 0, 'Branch                       : ' + str(data[0].get('bank_branch', ''))),
-                (bank_rows[4], 0, 'Swift Code                 : ' + str(data[0].get('swift_code', ''))),
-                (bank_rows[4] + 2, 0, 'Finance Department'),
-            ] + addess_company
-
-            for row, col, value in static_cells:
-                set_cell_text(doc.tables[0].cell(row, col), value)
-
             # Bold cells — subtotal, vat, total
             if vat_ori == 0:
                 set_cell_text(doc.tables[0].cell(total_row, 4), str(total).replace('.0', ''),    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
@@ -237,8 +221,31 @@ def generate_from_excel(file_path):
                 set_cell_text(doc.tables[0].cell(vat_row, 3), "VAT Total",      bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
                 set_cell_text(doc.tables[0].cell(total_row, 3), "Total",    bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
 
+            static_cells = [
+                (1, 4, dt_inv),
+                (2, 4, inv_no),
+                (3, 4, data[0].get('po')),
+                (title_note, 0, 'Payment notes:'),
+                (payment_notes_row, 0, data[0].get('payment_notes')),
+                (payment_notes_row2, 0, '2. Please make your payment into our account bank:'),
+                            ] + [
+                    (bank_rows[0], 0, 'Account Name           : ' + str(data[0].get('bank_account_name', '')).replace('.0', '')),
+                    (bank_rows[1], 0, 'Bank                          : ' + str(data[0].get('bank', ''))),
+                    (bank_rows[2], 0, 'Account Number        : ' + str(data[0].get('bank_account_number', '')).replace('.0', '')),
+                    (bank_rows[3], 0, 'Branch                       : ' + str(data[0].get('bank_branch', ''))),
+                    (bank_rows[4], 0, 'Swift Code                 : ' + str(data[0].get('swift_code', ''))),
+                    (bank_rows[4] + 2, 0, 'Finance Department'),
+                ]
 
-            
+            for row, col, value in static_cells:
+                set_cell_text(doc.tables[0].cell(row, col), value)
+
+            last_row = bank_rows[4] + 2
+            table = doc.tables[0]
+            while len(table.rows) > last_row + 1:
+                tr = table.rows[-1]._tr
+                tr.getparent().remove(tr)
+
             tmp_name = f'output/Invoice_{inv_no}.docx'
             doc.save(tmp_name)
             f.close()
