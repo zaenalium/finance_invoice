@@ -115,7 +115,11 @@ def _create_border_element(side, attrs):
 def generate_from_excel(file_path):
     if not os.path.exists(f'output'):
         os.makedirs(f'output')
-    df = pd.read_excel(file_path)
+    
+    try:
+        df = pd.read_excel(file_path)
+    except:
+        df = pd.read_csv(file_path)
 
     log_success = []
     for inv in tqdm(df.invoice_no.unique(), total = df.invoice_no.nunique()):
@@ -181,8 +185,12 @@ def generate_from_excel(file_path):
                 set_cell_text(doc.tables[0].cell(current_row, 4), f"{round(float(item.get('amount', ''))):,}".replace('.0', ''), align=WD_ALIGN_PARAGRAPH.RIGHT)
                 current_row += 1
             
-            for col in range(5):
-                set_cell_borders(doc.tables[0].cell(current_row-1, col), bottom = True)
+            if len(data) > 4:
+                for col in range(5):
+                    set_cell_borders(doc.tables[0].cell(current_row-1, col), bottom = True)
+            else:
+                current_row = 26 
+
 
             extra_rows = current_row - 26
 
